@@ -57,7 +57,7 @@ end
 
 function ModIndex:BeginStartupSequence(callback)
 	self.startingup = true
-	
+
 	if TheNet:IsDedicated() then
 		print("ModIndex: Beginning normal load sequence for dedicated server.\n")
 		self:DisableAllMods() --We assume the mods will be re-enabled by the modoverrides.lua file
@@ -146,7 +146,7 @@ function ModIndex:Save(callback)
     if IsConsole() then
         return
     end
-    
+
 	local newdata = { known_mods = {} }
 	newdata.known_api_version = MOD_API_VERSION
 	newdata.disable_special_event_warning = self.savedata.disable_special_event_warning
@@ -297,7 +297,7 @@ end
 function ModIndex:ApplyEnabledOverrides(mod_overrides) --Note(Peter): This function is now coupled with the format written by SaveIndex:SetServerEnabledMods
 	if mod_overrides == nil then
 		print("Warning: modoverrides.lua is empty, or is failing to return a table.")
-	else	
+	else
 		--Enable mods that are being forced on in the modoverrides.lua file
 		--print("ModIndex:ApplyEnabledOverrides for mods" )
 		for modname,env in pairs(mod_overrides) do
@@ -330,7 +330,7 @@ function ModIndex:ApplyConfigOptionOverrides(mod_overrides)
 				local actual_modname = ResolveModname(modname)
 				if actual_modname ~= nil then
 					print( "applying configuration_options from modoverrides.lua to mod " .. actual_modname )
-					
+
 					local force_local_options = true
 					local config_options,_ = self:GetModConfigurationOptions_Internal(actual_modname,force_local_options)
 
@@ -367,13 +367,13 @@ function ModIndex:LoadModInfo(modname)
 	for i,v in pairs(self.savedata.known_mods[modname].modinfo) do
 		-- print(i,v)
 	end
-	
+
 	info.version = TrimString(info.version or "")
 	info.version = string.lower(info.version)
 	info.version_compatible = type(info.version_compatible) == "string" and info.version_compatible or info.version
 	info.version_compatible = TrimString( info.version_compatible )
 	info.version_compatible = string.lower(info.version_compatible)
-	
+
 	if info.icon_atlas ~= nil and info.icon ~= nil and info.icon_atlas ~= "" and info.icon ~= "" then
 		local atlaspath = MODS_ROOT..modname.."/"..info.icon_atlas
 		local iconpath = string.gsub(atlaspath, "/[^/]*$", "") .. "/"..info.icon
@@ -395,7 +395,7 @@ function ModIndex:LoadModInfo(modname)
 		info.iconpath = nil
 		info.icon = nil
 	end
-	
+
 	--Add game modes
 	if info.game_modes then
 		for _,mode in pairs(info.game_modes) do
@@ -408,7 +408,7 @@ function ModIndex:LoadModInfo(modname)
 			end
 		end
 	end
-	
+
 	return info
 end
 
@@ -489,7 +489,7 @@ function ModIndex:InitializeModInfo(modname)
 		env.dst_compatible = true
 		env.dst_compatibility_specified = false
 	end
-	
+
 	if env.client_only_mod and env.all_clients_require_mod then
 		print("WARNING loading modinfo.lua: "..modname.." specifies client_only_mod and all_clients_require_mod. These flags are mutually exclusive.")
 	end
@@ -531,8 +531,8 @@ function ModIndex:Load(callback)
 					--print("\n\n---LOADING MOD INDEX---\n\n")
 					--dumptable(self.savedata)
 					--print("\n\n---END LOADING MOD INDEX---\n\n")
-					
-		
+
+
 					--print("\n\n---LOADING MOD INFOS---\n\n")
 					self:UpdateModInfo()
 					--dumptable(self.savedata)
@@ -608,7 +608,7 @@ function ModIndex:LoadModConfigurationOptions(modname, client_config)
 		print("Error: mod isn't known", modname )
 		return nil
 	end
-	
+
 	-- Try to find saved config settings first
 	local filename = self:GetModConfigurationPath(modname, client_config)
 	TheSim:GetPersistentString(filename,
@@ -737,7 +737,8 @@ end
 
 function ModIndex:DisableAllMods()
 	for k,v in pairs(self.savedata.known_mods) do
-		self:Disable(k)
+		--[me] turn off disable failed mods
+		-- self:Disable(k)
 	end
 end
 
@@ -748,18 +749,18 @@ function ModIndex:ClearTempModFlags(modname)
 	self.savedata.known_mods[modname].temp_enabled = false
 	self.savedata.known_mods[modname].temp_disabled = false
 	self.savedata.known_mods[modname].temp_config_options = nil
-	
+
 end
 
 function ModIndex:ClearAllTempModFlags()
 	--print( "ModIndex:ClearAllTempModFlags" )
-	
+
 	local function internal_clear_all_temp_mod_flags()
 		for k,v in pairs(self.savedata.known_mods) do
 			self:ClearTempModFlags(k)
 		end
 		self:Save(nil)
-	end 
+	end
 	if self.savedata == nil then
 		self:Load( internal_clear_all_temp_mod_flags )
 	else
@@ -803,7 +804,7 @@ function ModIndex:Enable(modname)
 	if not self.savedata.known_mods[modname].enabled then
 		self.savedata.disable_special_event_warning = false
 	end
-	
+
 	self.savedata.known_mods[modname].enabled = true
 	self.savedata.known_mods[modname].disabled_bad = false
 	self.savedata.known_mods[modname].disabled_incompatible_with_mode = false
@@ -874,7 +875,7 @@ function ModIndex:RestoreCachedSaveData(ext_data)
 		self.modsettings = self.cached_data.modsettings
 	end
 end
-	
+
 function ModIndex:UpdateModSettings()
 
 	self.modsettings = {
@@ -891,7 +892,7 @@ function ModIndex:UpdateModSettings()
 	local function EnableModError()
 		self.modsettings.moderror = true
 	end
-	
+
 	local env = {
 		ForceEnableMod = ForceEnableMod,
 		EnableModDebugPrint = EnableModDebugPrint,
@@ -958,7 +959,7 @@ function ModIndex:GetEnabledModTags()
 			end
 		end
 	end
-	return tags	
+	return tags
 end
 
 
